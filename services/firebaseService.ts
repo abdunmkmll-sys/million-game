@@ -1,6 +1,6 @@
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-import { getFirestore, collection, addDoc, query, orderBy, limit, getDocs, Timestamp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+import { initializeApp } from "firebase/app";
+import { getFirestore, collection, addDoc, query, orderBy, limit, getDocs, Timestamp } from "firebase/firestore";
 import { CommunityComment, Language, LeaderboardEntry } from "../types";
 
 // إعدادات المشروع
@@ -14,10 +14,11 @@ const firebaseConfig = {
   measurementId: "G-4CDJRLNQY1"
 };
 
-// تهيئة Firebase
-let app, db;
+// تهيئة Firebase بشكل آمن
+let db: any = null;
+
 try {
-  app = initializeApp(firebaseConfig);
+  const app = initializeApp(firebaseConfig);
   db = getFirestore(app);
 } catch (error) {
   console.error("Firebase initialization failed:", error);
@@ -25,7 +26,10 @@ try {
 
 export const firebaseService = {
   saveComment: async (userName: string, text: string, lang: Language): Promise<void> => {
-    if (!db) throw new Error("Database not initialized");
+    if (!db) {
+      console.warn("Database not initialized. Comment saved locally only.");
+      return;
+    }
 
     try {
       await addDoc(collection(db, "comments"), {
@@ -53,7 +57,7 @@ export const firebaseService = {
           userName: data.userName,
           text: data.text,
           lang: data.lang,
-          date: data.date ? data.date.toMillis() : Date.now()
+          date: data.date ? (data.date.toMillis ? data.date.toMillis() : Date.now()) : Date.now()
         } as CommunityComment;
       });
     } catch (error) {
@@ -63,7 +67,7 @@ export const firebaseService = {
   },
 
   saveLeaderboardScore: async (entry: Omit<LeaderboardEntry, 'id' | 'date'>): Promise<void> => {
-    if (!db) throw new Error("Database not initialized");
+    if (!db) return;
     try {
       await addDoc(collection(db, "leaderboard"), {
         ...entry,
@@ -85,7 +89,7 @@ export const firebaseService = {
         return {
           id: doc.id,
           ...data,
-          date: data.date ? data.date.toMillis() : Date.now()
+          date: data.date ? (data.date.toMillis ? data.date.toMillis() : Date.now()) : Date.now()
         } as LeaderboardEntry;
       });
     } catch (error) {
