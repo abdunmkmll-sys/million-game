@@ -2,7 +2,6 @@
 export type AgeGroup = 'child' | 'teen' | 'adult';
 export type Language = 'ar' | 'en' | 'fr' | 'es' | 'de';
 export type Difficulty = 'easy' | 'medium' | 'hard';
-export type MediaType = 'image' | 'video' | 'file';
 
 export interface Category {
   id: string;
@@ -35,9 +34,6 @@ export interface CommunityComment {
   id: string;
   userName: string;
   text: string;
-  mediaUrl?: string;
-  mediaType?: MediaType;
-  fileName?: string;
   date: number;
   lang: Language;
 }

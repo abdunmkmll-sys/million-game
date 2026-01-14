@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Language, AgeGroup, Category, Difficulty, CommunityComment, MediaType } from '../types';
+import { Language, AgeGroup, Category, Difficulty, CommunityComment } from '../types';
 import { translations } from '../translations';
 import { leaderboardService } from '../services/leaderboardService';
 import { firebaseService } from '../services/firebaseService';
@@ -22,9 +22,6 @@ const Results: React.FC<Props> = ({ lang, score, total, onReset, onViewLeaderboa
   const [name, setName] = useState('');
   const [saved, setSaved] = useState(false);
   const [commentText, setCommentText] = useState('');
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [mediaPreview, setMediaPreview] = useState<string | null>(null);
-  const [mediaType, setMediaType] = useState<MediaType | null>(null);
   const [isPosting, setIsPosting] = useState(false);
   const [postSuccess, setPostSuccess] = useState(false);
   const [recentComments, setRecentComments] = useState<CommunityComment[]>([]);
@@ -45,7 +42,6 @@ const Results: React.FC<Props> = ({ lang, score, total, onReset, onViewLeaderboa
   }
 
   useEffect(() => {
-    // Record statistics immediately when results are shown
     statsService.recordGame(score, total, !!isDailyChallenge);
     fetchComments();
   }, []);
@@ -61,7 +57,7 @@ const Results: React.FC<Props> = ({ lang, score, total, onReset, onViewLeaderboa
 
   const handleSave = async () => {
     if (!name.trim()) return;
-    setSaved(true); // Disable button immediately
+    setSaved(true);
     try {
       await leaderboardService.addScore({
         name,
@@ -77,37 +73,15 @@ const Results: React.FC<Props> = ({ lang, score, total, onReset, onViewLeaderboa
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setSelectedFile(file);
-      
-      const fileType = file.type;
-      let type: MediaType = 'file';
-      if (fileType.startsWith('image/')) type = 'image';
-      else if (fileType.startsWith('video/')) type = 'video';
-      
-      setMediaType(type);
-      if (type !== 'file') {
-        setMediaPreview(URL.createObjectURL(file));
-      } else {
-        setMediaPreview(null);
-      }
-    }
-  };
-
   const handlePostComment = async () => {
     const finalName = name || (lang === 'ar' ? 'لاعب مجهول' : 'Anonymous Player');
-    if (!commentText.trim() && !selectedFile) return;
+    if (!commentText.trim()) return;
 
     setIsPosting(true);
     try {
-      await firebaseService.saveComment(finalName, commentText, lang, selectedFile || undefined);
+      await firebaseService.saveComment(finalName, commentText, lang);
       setPostSuccess(true);
       setCommentText('');
-      setSelectedFile(null);
-      setMediaPreview(null);
-      setMediaType(null);
       await fetchComments();
       
       setTimeout(() => setPostSuccess(false), 5000);
@@ -156,27 +130,6 @@ const Results: React.FC<Props> = ({ lang, score, total, onReset, onViewLeaderboa
         </div>
       </div>
 
-      <div className="mb-10 p-2 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 rounded-[2.5rem] border border-white/40 shadow-xl overflow-hidden animate-fade-slide">
-        <div className="relative overflow-hidden rounded-[2rem] aspect-video md:aspect-[16/9] shadow-inner group">
-           <img 
-            src="https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=2070&auto=format&fit=crop" 
-            alt="Meal Gift"
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-            style={{ 
-              backgroundImage: 'url("https://i.ibb.co/K79wL1m/kfc-meal.jpg")', 
-              backgroundSize: 'cover',
-              backgroundPosition: 'center'
-            }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col items-center justify-end pb-8">
-             <span className="text-white font-black text-2xl md:text-4xl drop-shadow-[0_4px_4px_rgba(0,0,0,0.5)] transform translate-y-2">
-                {t.mealGift}
-             </span>
-             <div className="w-16 h-1.5 bg-indigo-400 rounded-full mt-4 animate-pulse"></div>
-          </div>
-        </div>
-      </div>
-      
       <div className="bg-white/80 backdrop-blur p-5 rounded-3xl mb-10 border border-indigo-100 shadow-sm">
         <p className="text-indigo-800 font-black text-xl">{feedback}</p>
       </div>
@@ -225,62 +178,23 @@ const Results: React.FC<Props> = ({ lang, score, total, onReset, onViewLeaderboa
               />
             </div>
             
-            <div className="flex flex-col gap-4">
-              <div className="flex flex-wrap gap-3">
-                <label className="flex-1 flex items-center justify-center gap-3 cursor-pointer bg-white px-6 py-4 rounded-2xl shadow-sm border-2 border-dashed border-indigo-200 hover:border-indigo-500 hover:bg-indigo-50 transition-all text-sm font-black text-indigo-600">
-                  <span className="text-xl">📷</span>
-                  {t.community.uploadMedia}
-                  <input type="file" accept="image/*,video/*" className="hidden" onChange={handleFileChange} disabled={isPosting} />
-                </label>
-              </div>
-              
-              {selectedFile && (
-                <div className="flex items-center gap-5 bg-indigo-600 text-white p-4 rounded-3xl w-full shadow-xl animate-pop overflow-hidden relative group">
-                  {mediaType === 'image' && mediaPreview && (
-                    <img src={mediaPreview} className="w-20 h-20 rounded-2xl object-cover shadow-md border-2 border-white/20" />
-                  )}
-                  {mediaType === 'video' && mediaPreview && (
-                    <div className="w-20 h-20 bg-black rounded-2xl flex items-center justify-center shadow-md relative overflow-hidden">
-                       <video src={mediaPreview} className="w-full h-full object-cover opacity-80" muted />
-                       <span className="absolute text-white text-lg">🎥</span>
-                    </div>
-                  )}
-                  {mediaType === 'file' && (
-                    <div className="w-20 h-20 bg-white/20 rounded-2xl flex items-center justify-center text-4xl shadow-md">📄</div>
-                  )}
-                  <div className="flex-1 flex flex-col justify-center truncate">
-                    <span className="text-xs uppercase font-black opacity-70 mb-1">{mediaType} Selected</span>
-                    <span className="text-sm font-bold truncate">{selectedFile.name}</span>
-                  </div>
-                  {!isPosting && (
-                    <button 
-                      onClick={() => {setSelectedFile(null); setMediaPreview(null); setMediaType(null);}} 
-                      className="bg-white/20 hover:bg-white/40 text-white w-10 h-10 rounded-full flex items-center justify-center font-black transition-all"
-                    >
-                      ✕
-                    </button>
-                  )}
-                </div>
+            <button
+              onClick={handlePostComment}
+              disabled={isPosting || !commentText.trim()}
+              className="w-full bg-indigo-600 text-white py-5 rounded-3xl font-black text-lg hover:bg-indigo-700 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 transition-all shadow-xl flex items-center justify-center gap-3"
+            >
+              {isPosting ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <span>{lang === 'ar' ? 'جاري النشر...' : 'Posting...'}</span>
+                </>
+              ) : (
+                <>
+                  <span>🚀</span>
+                  {t.community.post}
+                </>
               )}
-
-              <button
-                onClick={handlePostComment}
-                disabled={isPosting || (!commentText.trim() && !selectedFile)}
-                className="w-full bg-indigo-600 text-white py-5 rounded-3xl font-black text-lg hover:bg-indigo-700 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 transition-all shadow-xl flex items-center justify-center gap-3"
-              >
-                {isPosting ? (
-                  <>
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    <span>{lang === 'ar' ? 'جاري النشر...' : 'Posting...'}</span>
-                  </>
-                ) : (
-                  <>
-                    <span>🚀</span>
-                    {t.community.post}
-                  </>
-                )}
-              </button>
-            </div>
+            </button>
           </div>
         ) : (
           <div className="p-8 bg-green-50 text-green-700 rounded-[2rem] font-black text-lg mb-10 animate-pop text-center border-2 border-green-200 shadow-md">
@@ -308,44 +222,7 @@ const Results: React.FC<Props> = ({ lang, score, total, onReset, onViewLeaderboa
                     </div>
                     <span className="text-[10px] text-gray-400 font-black bg-gray-50 px-3 py-1 rounded-full">{new Date(comment.date).toLocaleDateString()}</span>
                   </div>
-                  
-                  <p className="text-gray-700 text-base leading-relaxed mb-5 font-medium">{comment.text}</p>
-                  
-                  {comment.mediaUrl && (
-                    <div className="rounded-[1.5rem] overflow-hidden border border-gray-100 shadow-sm bg-black/5 relative aspect-auto max-h-[400px]">
-                      {comment.mediaType === 'image' && (
-                        <img 
-                          src={comment.mediaUrl} 
-                          className="w-full h-full object-contain cursor-pointer transition-transform duration-500 hover:scale-[1.01]" 
-                          onClick={() => window.open(comment.mediaUrl, '_blank')}
-                          loading="lazy"
-                        />
-                      )}
-                      {comment.mediaType === 'video' && (
-                        <video 
-                          src={comment.mediaUrl} 
-                          className="w-full h-full max-h-[400px]" 
-                          controls
-                          preload="metadata"
-                        />
-                      )}
-                      {comment.mediaType === 'file' && (
-                        <div className="p-6 flex items-center justify-between gap-5 bg-indigo-50/50">
-                          <div className="flex items-center gap-4">
-                            <span className="text-4xl">📄</span>
-                            <span className="text-sm font-black text-indigo-900 truncate max-w-[150px] md:max-w-xs">{comment.fileName}</span>
-                          </div>
-                          <a 
-                            href={comment.mediaUrl} 
-                            target="_blank" 
-                            className="bg-indigo-600 text-white px-6 py-3 rounded-2xl text-xs font-black shadow-lg hover:bg-indigo-700 transition-all whitespace-nowrap"
-                          >
-                            {t.community.downloadFile}
-                          </a>
-                        </div>
-                      )}
-                    </div>
-                  )}
+                  <p className="text-gray-700 text-base leading-relaxed font-medium">{comment.text}</p>
                 </div>
               ))}
             </div>

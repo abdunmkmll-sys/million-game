@@ -41,14 +41,12 @@ export const translations: Record<Language, any> = {
     },
     community: {
       title: 'حائط المجتمع',
-      addComment: 'شارك رأيك وملفاتك!',
+      addComment: 'شارك رأيك مع الجميع!',
       commentPlaceholder: 'اكتب تعليقك هنا...',
-      uploadMedia: 'إضافة ميديا (صور/فيديو/ملف)',
       post: 'نشر التعليق',
       recent: 'أحدث المشاركات',
       success: 'تم النشر بنجاح!',
-      noComments: 'كن أول من يشارك!',
-      downloadFile: 'تحميل الملف'
+      noComments: 'كن أول من يشارك!'
     },
     mealGift: 'هذه الوجبة هدية لك 🎁🍟',
     hintLabel: 'تلميح',
@@ -99,14 +97,12 @@ export const translations: Record<Language, any> = {
     },
     community: {
       title: 'Community Wall',
-      addComment: 'Share comments & files!',
+      addComment: 'Share your thoughts!',
       commentPlaceholder: 'Type your feedback...',
-      uploadMedia: 'Upload Media (Img/Vid/File)',
       post: 'Post Comment',
       recent: 'Recent Posts',
       success: 'Posted successfully!',
-      noComments: 'Be the first to share!',
-      downloadFile: 'Download File'
+      noComments: 'Be the first to share!'
     },
     mealGift: 'This meal is a gift for you! 🎁🍟',
     hintLabel: 'Hint',
@@ -157,14 +153,12 @@ export const translations: Record<Language, any> = {
     },
     community: {
       title: 'Mur Communautaire',
-      addComment: 'Partagez des fichiers !',
+      addComment: 'Partagez votre avis !',
       commentPlaceholder: 'Votre avis...',
-      uploadMedia: 'Média (Img/Vid/File)',
       post: 'Publier',
       recent: 'Derniers posts',
       success: 'Publié avec succès !',
-      noComments: 'Soyez le premier à partager !',
-      downloadFile: 'Télécharger'
+      noComments: 'Soyez le premier à partager !'
     },
     mealGift: 'Ce repas est un cadeau pour vous ! 🎁🍟',
     hintLabel: 'Indice',
@@ -215,14 +209,12 @@ export const translations: Record<Language, any> = {
     },
     community: {
       title: 'Muro Comunitario',
-      addComment: '¡Comparte archivos!',
+      addComment: '¡Comparte tu opinión!',
       commentPlaceholder: 'Tu opinión...',
-      uploadMedia: 'Multimedia',
       post: 'Publicar',
       recent: 'Publicaciones recientes',
       success: '¡Publicado con éxito!',
-      noComments: '¡Sé el primero en compartir!',
-      downloadFile: 'Descargar'
+      noComments: '¡Sé el primero en compartir!'
     },
     mealGift: '¡Esta comida es un regalo para ti! 🎁🍟',
     hintLabel: 'Pista',
@@ -273,14 +265,12 @@ export const translations: Record<Language, any> = {
     },
     community: {
       title: 'Community-Wall',
-      addComment: 'Teile Dateien!',
+      addComment: 'Teile deine Meinung!',
       commentPlaceholder: 'Dein Feedback...',
-      uploadMedia: 'Medien hochladen',
       post: 'Veröffentlichen',
       recent: 'Neueste Beiträge',
       success: 'Erfolgreich gepostet!',
-      noComments: 'Teile als Erster!',
-      downloadFile: 'Herunterladen'
+      noComments: 'Teile als Erster!'
     },
     mealGift: 'Diese Mahlzeit ist ein Geschenk für dich! 🎁🍟',
     hintLabel: 'Hinweis',

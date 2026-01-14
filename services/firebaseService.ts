@@ -1,8 +1,7 @@
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
 import { getFirestore, collection, addDoc, query, orderBy, limit, getDocs, Timestamp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-storage.js";
-import { CommunityComment, Language, MediaType, LeaderboardEntry, AgeGroup, Difficulty } from "../types";
+import { CommunityComment, Language, LeaderboardEntry } from "../types";
 
 // إعدادات المشروع
 const firebaseConfig = {
@@ -16,50 +15,23 @@ const firebaseConfig = {
 };
 
 // تهيئة Firebase
-let app, db, storage;
+let app, db;
 try {
   app = initializeApp(firebaseConfig);
   db = getFirestore(app);
-  storage = getStorage(app);
 } catch (error) {
   console.error("Firebase initialization failed:", error);
 }
 
 export const firebaseService = {
-  saveComment: async (userName: string, text: string, lang: Language, file?: File): Promise<void> => {
+  saveComment: async (userName: string, text: string, lang: Language): Promise<void> => {
     if (!db) throw new Error("Database not initialized");
 
-    let mediaUrl = "";
-    let mediaType: MediaType | undefined;
-    let fileName = "";
-
     try {
-      if (file) {
-        fileName = file.name;
-        const extension = file.name.split('.').pop()?.toLowerCase();
-        
-        if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(extension || '')) {
-          mediaType = 'image';
-        } else if (['mp4', 'mov', 'avi', 'webm'].includes(extension || '')) {
-          mediaType = 'video';
-        } else {
-          mediaType = 'file';
-        }
-
-        const path = `community/${mediaType}/${Date.now()}_${file.name}`;
-        const storageRef = ref(storage, path);
-        
-        const snapshot = await uploadBytes(storageRef, file);
-        mediaUrl = await getDownloadURL(snapshot.ref);
-      }
-
       await addDoc(collection(db, "comments"), {
         userName,
         text,
         lang,
-        mediaUrl,
-        mediaType,
-        fileName,
         date: Timestamp.now()
       });
     } catch (error: any) {
@@ -80,9 +52,6 @@ export const firebaseService = {
           id: doc.id,
           userName: data.userName,
           text: data.text,
-          mediaUrl: data.mediaUrl,
-          mediaType: data.mediaType,
-          fileName: data.fileName,
           lang: data.lang,
           date: data.date ? data.date.toMillis() : Date.now()
         } as CommunityComment;
