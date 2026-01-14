@@ -18,6 +18,7 @@ const firebaseConfig = {
 let db: any = null;
 
 try {
+  // استخدام الروابط من الخريطة المباشرة يضمن بقاء الـ App والـ Firestore في نفس السياق
   const app = initializeApp(firebaseConfig);
   db = getFirestore(app);
 } catch (error) {
