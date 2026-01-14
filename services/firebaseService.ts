@@ -27,7 +27,7 @@ try {
 export const firebaseService = {
   saveComment: async (userName: string, text: string, lang: Language): Promise<void> => {
     if (!db) {
-      console.warn("Database not initialized. Comment saved locally only.");
+      console.warn("Database not initialized.");
       return;
     }
 

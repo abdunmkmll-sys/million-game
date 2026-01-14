@@ -42,6 +42,7 @@ const Results: React.FC<Props> = ({ lang, score, total, onReset, onViewLeaderboa
   }
 
   useEffect(() => {
+    // Record statistics immediately when results are shown
     statsService.recordGame(score, total, !!isDailyChallenge);
     fetchComments();
   }, []);
@@ -57,7 +58,7 @@ const Results: React.FC<Props> = ({ lang, score, total, onReset, onViewLeaderboa
 
   const handleSave = async () => {
     if (!name.trim()) return;
-    setSaved(true);
+    setSaved(true); // Disable button immediately
     try {
       await leaderboardService.addScore({
         name,
@@ -130,6 +131,27 @@ const Results: React.FC<Props> = ({ lang, score, total, onReset, onViewLeaderboa
         </div>
       </div>
 
+      <div className="mb-10 p-2 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 rounded-[2.5rem] border border-white/40 shadow-xl overflow-hidden animate-fade-slide">
+        <div className="relative overflow-hidden rounded-[2rem] aspect-video md:aspect-[16/9] shadow-inner group">
+           <img 
+            src="https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=2070&auto=format&fit=crop" 
+            alt="Meal Gift"
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+            style={{ 
+              backgroundImage: 'url("https://i.ibb.co/K79wL1m/kfc-meal.jpg")', 
+              backgroundSize: 'cover',
+              backgroundPosition: 'center'
+            }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col items-center justify-end pb-8">
+             <span className="text-white font-black text-2xl md:text-4xl drop-shadow-[0_4px_4px_rgba(0,0,0,0.5)] transform translate-y-2">
+                {t.mealGift}
+             </span>
+             <div className="w-16 h-1.5 bg-indigo-400 rounded-full mt-4 animate-pulse"></div>
+          </div>
+        </div>
+      </div>
+      
       <div className="bg-white/80 backdrop-blur p-5 rounded-3xl mb-10 border border-indigo-100 shadow-sm">
         <p className="text-indigo-800 font-black text-xl">{feedback}</p>
       </div>
@@ -161,7 +183,7 @@ const Results: React.FC<Props> = ({ lang, score, total, onReset, onViewLeaderboa
       <div className="mt-12 mb-10 bg-white/60 p-6 md:p-8 rounded-[3rem] border border-white shadow-2xl backdrop-blur-md text-start">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-2xl font-black text-indigo-900 flex items-center gap-3">
-            <span className="bg-indigo-100 p-2 rounded-xl text-xl">🖼️</span> 
+            <span className="bg-indigo-100 p-2 rounded-xl text-xl">💬</span> 
             {t.community.title}
           </h3>
         </div>
@@ -222,6 +244,7 @@ const Results: React.FC<Props> = ({ lang, score, total, onReset, onViewLeaderboa
                     </div>
                     <span className="text-[10px] text-gray-400 font-black bg-gray-50 px-3 py-1 rounded-full">{new Date(comment.date).toLocaleDateString()}</span>
                   </div>
+                  
                   <p className="text-gray-700 text-base leading-relaxed font-medium">{comment.text}</p>
                 </div>
               ))}
